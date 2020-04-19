@@ -9,7 +9,10 @@ It has the following features -
 Features to be added :
  i) seek button for managing audio progress
  ii) suypport for all formats
- 
- Currently it is using pygame module's music class to play audio files but it has a problem in playing a few files.
+Current Issues:
+ i) A thread was used to calculate current playing time of of the audio file.It raises an error when the window is closed without stopping the audio being played.An attempt to fix the problem was made by overriding the **X** button functionality but in vain.
+
+
+ Currently it is using pygame module's mixer class to play audio files but it has a problem in playing a few files.
  
  ****All icons are downloaded from flaticon.com**** 

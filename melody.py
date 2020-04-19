@@ -45,31 +45,36 @@ volumeStatus = "On"
 currentVolume = 0.3
 volumeScaleReading = 30
 lengthInSeconds = 0
+index = 0
+playlist = []
 
 #function for browsing files
 def browse_files():
     global fileName
     global audioFileName 
     fileName = filedialog.askopenfilename()
-    if(fileName.find("/")!=-1):
-        audioFileName = fileName.split("/")[-1]
-    elif(fileName.find("\\")!=-1):
-        audioFileName = fileName.split("\\")[-1]
+    if(fileName=="" or fileName==()):
+        pass
     else:
-        audioFileName = fileName
-    stop_music()
-    statusBar["fg"] = "Black"
-    statusBar["text"] = "Selected :-> " + audioFileName
-    capitalizedName = audioFileName[:-4]
-    audioFileNameSplitted = capitalizedName.split(" ")
-    capitalizedName = ""
-    for word in audioFileNameSplitted:
-        if(word==audioFileName[-1]):
-            capitalizedName += word.capitalize()
+        if(fileName.find("/")!=-1):
+            audioFileName = fileName.split("/")[-1]
+        elif(fileName.find("\\")!=-1):
+            audioFileName = fileName.split("\\")[-1]
         else:
-            capitalizedName += word.capitalize() + " "
-    mainCanvas.itemconfig(audioFileCanvasText,text=capitalizedName)
-    show_length()
+            audioFileName = fileName
+        stop_music()
+        statusBar["fg"] = "Black"
+        statusBar["text"] = "Selected :-> " + audioFileName
+        capitalizedName = audioFileName[:-4]
+        audioFileNameSplitted = capitalizedName.split(" ")
+        capitalizedName = ""
+        for word in audioFileNameSplitted:
+            if(word==audioFileName[-1]):
+                capitalizedName += word.capitalize()
+            else:
+                capitalizedName += word.capitalize() + " "
+        mainCanvas.itemconfig(audioFileCanvasText,text=capitalizedName)
+        show_length()
 
 def show_length():  # displays length of file
     global lengthInSeconds
@@ -113,6 +118,7 @@ def dark_theme():   # implements the dark theme of the application
     fileMenu.config(bg="Black",fg="White")
     helpMenu.config(bg="Black",fg="White")
     fileMenu.entryconfigure("Dark Mode",label="Light Mode",command=disable_dark_mode)
+    playlistBox.configure(fg="White",bg="Black")
 
 def disable_dark_mode():    # disables the dark theme
     global canvasImage
@@ -143,6 +149,7 @@ def disable_dark_mode():    # disables the dark theme
     fileMenu.config(bg="White",fg="Black")
     helpMenu.config(bg="White",fg="Black")
     fileMenu.entryconfigure("Light Mode",label="Dark Mode",command=dark_theme)
+    playlistBox.configure(fg="Black",bg="White")
     
 
 # adding submenus
@@ -322,10 +329,41 @@ volumeScale.grid(row=0,column=2,padx=10)
 statusBar = tk.Label(mainCanvas,text="Welcome to Melody.",bg="Sky Blue",fg="Blue",relief=tk.SUNKEN,anchor=tk.W) # Status Bar
 statusBar.pack(fill=tk.X,side=tk.BOTTOM)
 
+playlistBox = tk.Listbox(mainCanvas)
+playlistBox.place(x=410,y=89)
+
+def addToPlaylist():
+    global fileName
+    global audioFileName
+    global playlist 
+    global index
+    browse_files()
+    if(fileName=="" or fileName==()):
+        pass
+    else:
+        playlistBox.insert(index,audioFileName)
+        playlist.append(fileName)
+        index += 1
+
+addToPlaylistButton = tk.Button(mainCanvas,text ="Add",command=addToPlaylist)
+addToPlaylistButton.place(x=410,y=280)
+
+def deleteFromPlaylist():
+    audioIndex = playlistBox.curselection()
+    if(audioIndex=="" or audioIndex==()):
+        pass
+    else:
+        playlistBox.delete(audioIndex)
+        audioIndex = str(audioIndex).replace("(","").replace(")","").replace(",","")
+        playlist.pop(int(audioIndex))
+
+removeFromPlaylistButton = tk.Button(mainCanvas,text="Delete",command=deleteFromPlaylist)
+removeFromPlaylistButton.place(x=465,y=280)
+
 def on_quit():
     stop_music()
-    melody.destroy()
+    melody.quit()
 
 melody.config(menu=menuBar)
-melody.protocol("WM_WINDOW_DELETE",on_quit)
+melody.protocol("WM_DELETE_WINDOW",on_quit)
 melody.mainloop()   #calling the mainloop() function of tkinter library
